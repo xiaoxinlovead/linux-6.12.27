@@ -35,8 +35,8 @@ struct sbiret __sbi_ecall(unsigned long arg0, unsigned long arg1,
 	register uintptr_t a6 asm ("a6") = (uintptr_t)(fid);
 	register uintptr_t a7 asm ("a7") = (uintptr_t)(ext);
 	asm volatile ("ecall"
-		       : "+r" (a0), "+r" (a1)
-		       : "r" (a2), "r" (a3), "r" (a4), "r" (a5), "r" (a6), "r" (a7)
+		       : "+r" (a0), "+r" (a1), "+r" (a6)
+		       : "r" (a2), "r" (a3), "r" (a4), "r" (a5), "r" (a7)
 		       : "memory");
 	ret.error = a0;
 	ret.value = a1;
