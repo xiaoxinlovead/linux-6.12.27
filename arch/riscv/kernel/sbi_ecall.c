@@ -2,6 +2,7 @@
 /* Copyright (c) 2024 Rivos Inc. */
 
 #include <asm/sbi.h>
+#include <linux/compiler.h>
 #define CREATE_TRACE_POINTS
 #include <asm/trace.h>
 
@@ -34,7 +35,10 @@ struct sbiret __sbi_ecall(unsigned long arg0, unsigned long arg1,
 	register uintptr_t a5 asm ("a5") = (uintptr_t)(arg5);
 	register uintptr_t a6 asm ("a6");
 	register uintptr_t a7 asm ("a7") = (uintptr_t)(ext);
-	a6 = (uintptr_t)(fid);
+	/* Force fid into a6. We use volatile asm with a temporary register
+	   to prevent the compiler from skipping the move when fid is already
+	   in a6 (7th function parameter uses a6 in the calling convention). */
+	__asm__ __volatile__ ("add %0, %1, zero" : "=r"(a6) : "r"((uintptr_t)(fid)));
 	asm volatile ("ecall"
 		       : "+r" (a0), "+r" (a1), "+r" (a6)
 		       : "r" (a2), "r" (a3), "r" (a4), "r" (a5), "r" (a7)
